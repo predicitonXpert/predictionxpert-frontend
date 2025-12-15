@@ -35,16 +35,16 @@ export function ChatInput({ onSend, disabled = false, placeholder = 'Ask about s
         placeholder={placeholder}
         disabled={disabled}
         rows={1}
-        className="flex-1 resize-none rounded-xl border-2 border-zinc-300 bg-white px-4 py-3 text-base text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex-1 resize-none rounded-xl border-2 border-zinc-300 bg-white px-3 md:px-4 py-2 md:py-3 text-sm md:text-base text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 disabled:cursor-not-allowed disabled:opacity-50"
         style={{ minHeight: '52px', maxHeight: '120px' }}
       />
       <button
         type="submit"
         disabled={disabled || !input.trim()}
-        className="flex h-[52px] w-[52px] items-center justify-center rounded-xl bg-zinc-900 text-white transition-all hover:bg-zinc-800 hover:shadow-lg hover:shadow-zinc-900/30 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex h-[44px] w-[44px] md:h-[52px] md:w-[52px] items-center justify-center rounded-xl bg-zinc-900 text-white transition-all hover:bg-zinc-800 hover:shadow-lg hover:shadow-zinc-900/30 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
         aria-label="Send message"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 md:h-6 md:w-6">
           <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
         </svg>
       </button>

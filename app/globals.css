@@ -19,8 +19,8 @@
   }
 }
 
-body {
-  background: var(--background);
+html, body {
+  background: #000000;
   color: var(--foreground);
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
