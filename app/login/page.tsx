@@ -1,9 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
+import { Button } from '@/components/ui'
+import { Input } from '@/components/ui'
+import { Logo } from '@/components/layout'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -11,7 +15,15 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const { user } = useAuth()
   const supabase = createClient()
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard')
+    }
+  }, [user, router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -19,14 +31,9 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw error
-
-      router.push('/')
+      router.push('/dashboard')
       router.refresh()
     } catch (err: any) {
       setError(err.message || 'An error occurred during login')
@@ -36,73 +43,54 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-zinc-900">
-        <h1 className="mb-6 text-3xl font-semibold text-black dark:text-zinc-50">
-          Connexion
-        </h1>
-        
-        {error && (
-          <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
-            {error}
-          </div>
-        )}
+    <div className="flex min-h-screen items-center justify-center bg-black p-4">
+      <div className="w-full max-w-sm">
+        <div className="mb-8 flex justify-center">
+          
+        </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
-              Email
-            </label>
-            <input
+        <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-6 shadow-xl">
+          <h1 className="mb-6 text-2xl font-semibold text-white">Se connecter</h1>
+
+          {error && (
+            <div className="mb-4 rounded-lg bg-red-900/30 border border-red-800/50 p-3 text-sm text-red-400">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <Input
               id="email"
               type="email"
+              label="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
               required
-              className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-black shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-zinc-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-50"
-              placeholder="votre@email.com"
             />
-          </div>
 
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
-              Mot de passe
-            </label>
-            <input
+            <Input
               id="password"
               type="password"
+              label="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
               required
-              className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-black shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-zinc-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-50"
-              placeholder="••••••••"
             />
-          </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-md bg-black px-4 py-2 font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
-          >
-            {loading ? 'Connexion...' : 'Se connecter'}
-          </button>
-        </form>
+            <Button type="submit" loading={loading} className="w-full">
+              Se connecter
+            </Button>
+          </form>
 
-        <p className="mt-4 text-center text-sm text-zinc-600 dark:text-zinc-400">
-          Pas encore de compte ?{' '}
-          <Link
-            href="/signup"
-            className="font-medium text-black hover:underline dark:text-zinc-50"
-          >
-            Créer un compte
-          </Link>
-        </p>
+          <p className="mt-4 text-center text-sm text-zinc-400">
+            Pas encore de compte ?{' '}
+            <Link href="/signup" className="font-medium text-white hover:text-zinc-300 underline">
+              S'inscrire
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

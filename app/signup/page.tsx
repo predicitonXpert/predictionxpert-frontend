@@ -6,10 +6,10 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
 export default function SignupPage() {
-  const [lastName, setLastName] = useState('')
-  const [firstName, setFirstName] = useState('')
+  const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [legalAccepted, setLegalAccepted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -29,14 +29,14 @@ export default function SignupPage() {
 
       if (authError) throw authError
 
-      // If user is created, update the users table with first_name and last_name
+      // If user is created, update the users table with username and legal acceptance
       if (authData.user) {
         const { error: profileError } = await supabase
           .from('users')
           .update({
-            first_name: firstName,
-            last_name: lastName,
+            username,
             email,
+            legal_accepted_at: new Date().toISOString(),
           })
           .eq('id', authData.user.id)
 
@@ -46,7 +46,7 @@ export default function SignupPage() {
         }
       }
 
-      router.push('/')
+      router.push('/dashboard')
       router.refresh()
     } catch (err: any) {
       setError(err.message || 'An error occurred during signup')
@@ -71,37 +71,19 @@ export default function SignupPage() {
         <form onSubmit={handleSignup} className="space-y-4">
           <div>
             <label
-              htmlFor="firstName"
+              htmlFor="username"
               className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              First Name
+              Username
             </label>
             <input
-              id="firstName"
+              id="username"
               type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
               className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-black shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-zinc-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-50"
-              placeholder="Your first name"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="lastName"
-              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
-              Last Name
-            </label>
-            <input
-              id="lastName"
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-              className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-black shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-zinc-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-50"
-              placeholder="Your last name"
+              placeholder="Choose a username"
             />
           </div>
 
@@ -145,9 +127,27 @@ export default function SignupPage() {
             </p>
           </div>
 
+          <div className="flex items-start gap-3">
+            <input
+              id="legalAccepted"
+              type="checkbox"
+              checked={legalAccepted}
+              onChange={(e) => setLegalAccepted(e.target.checked)}
+              required
+              className="mt-1 h-4 w-4 rounded border-zinc-300 text-black focus:ring-zinc-500 dark:border-zinc-600 dark:bg-zinc-800"
+            />
+            <label
+              htmlFor="legalAccepted"
+              className="text-xs text-zinc-600 dark:text-zinc-400"
+            >
+              <span className="font-semibold text-red-600 dark:text-red-400">(Obligatoire)</span>{' '}
+              Je confirme avoir 18 ans ou plus, respecter les lois de ma région concernant les paris sportifs, et comprendre que PredictionXpert ne garantit aucun résultat, peut faire des erreurs et doit être utilisé de façon responsable.
+            </label>
+          </div>
+
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !legalAccepted}
             className="w-full rounded-md bg-black px-4 py-2 font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
           >
             {loading ? 'Création...' : 'Créer un compte'}

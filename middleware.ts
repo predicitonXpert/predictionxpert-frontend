@@ -32,10 +32,22 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const pathname = request.nextUrl.pathname
+
+  // Root path: accessible to everyone (homepage)
+  // No redirect needed, let everyone access it
+
   // Protect routes that require authentication
-  if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
+  if (!user && pathname.startsWith('/dashboard')) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  // Redirect logged-in users away from login/signup pages to dashboard
+  if (user && (pathname === '/login' || pathname === '/signup')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/dashboard'
     return NextResponse.redirect(url)
   }
 

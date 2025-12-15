@@ -4,7 +4,7 @@ import { ChatWindow } from '@/components/chat'
 
 export default function DashboardPage() {
   return (
-    <div className="mx-auto h-[calc(100vh-80px)] max-w-5xl p-6">
+    <div className="mx-auto h-full max-w-5xl">
       <ChatWindow />
     </div>
   )

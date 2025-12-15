@@ -1,176 +1,389 @@
 'use client'
 
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import Image from 'next/image'
+import Link from 'next/link'
+import { Logo } from '@/components/layout'
+import { useAuth } from '@/contexts/AuthContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 
-export default function Home() {
-  const { user, loading, signOut } = useAuth();
-  const router = useRouter();
-  const [lang, setLang] = useState<'en' | 'fr'>('en');
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
-    }
-  }, [user, loading, router]);
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-black">
-        <div className="text-lg text-zinc-400">
-          {lang === 'en' ? 'Loading...' : 'Chargement...'}
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
-
-  const content = {
-    en: {
-      slogan: "Your sidekick for sports betting.",
-      tagline: "Everything about sports betting. Just ask now.",
-      howItWorks: "How it works",
-      howItWorksDesc: "Whether you're just starting, betting regularly, or already sharp, we're here to support your sports betting journey.",
-      steps: [
-        { num: "1", title: "Create your account", desc: "Sign up in seconds" },
-        { num: "2", title: "Ask anything", desc: "Just type anything about sports betting, the chat answers instantly." },
-        { num: "3", title: "Get clear guidance", desc: "No confusing stats, no overload, just simple explanations and smart insights." },
-        { num: "4", title: "Bet smarter over time", desc: "The more you use it, the easier betting becomes." },
-      ],
-      whyTitle: "Why PredictionXpert",
-      whyContent: [
-        "Sports betting can be overwhelming. Too many stats, too much noise, and way too many \"experts\" yelling different opinions. PredictionXpert cuts through all of that.",
-        "This isn't another dashboard or pick service. It's a conversation. You ask, it answers instantly.",
-        "Before the game, during the game, and especially in live betting when timing matters most, we're here.",
-        "Props, parlays, spreads, live bets — ask as the game unfolds.",
-        "Simple like ChatGPT, but actually built for sports betting.",
-        "Your shortcut to understanding bets without reading 1,000 stats.",
-      ],
-      whyBottom: [
-        "Learn faster, Bet smarter with us.",
-        "Sports betting shouldn't be complicated. We keep it simple for you.",
-        "No waiting — we answer in seconds, 24/7.",
-      ],
-      startChat: "Start Chat",
-      signOut: "Sign out",
+const content = {
+  fr: {
+    nav: {
+      login: 'Se connecter',
+      signup: "S'inscrire",
+      logout: 'Se déconnecter',
     },
-    fr: {
-      slogan: "Ton compagnon pour tes paris sportifs.",
-      tagline: "Tout sur les paris sportifs. Pose tes questions maintenant.",
-      howItWorks: "Comment ça marche",
-      howItWorksDesc: "Que tu commences, que tu mises régulièrement ou que tu sois déjà expérimenté, on est là pour t'accompagner dans tes paris sportifs.",
-      steps: [
-        { num: "1", title: "Crée ton compte", desc: "Inscription en quelques secondes, rien de compliqué." },
-        { num: "2", title: "Pose ta question", desc: "Écris n'importe quoi sur les paris sportifs, le chat répond instantanément." },
-        { num: "3", title: "Reçois des réponses claires", desc: "Pas de statistiques confuses ni d'informations inutiles, juste des explications simples et utiles." },
-        { num: "4", title: "Parie plus intelligemment avec le temps", desc: "Plus tu l'utilises, plus tout devient facile." },
-      ],
-      whyTitle: "Pourquoi PredictionXpert",
-      whyContent: [
-        "Les paris sportifs peuvent devenir compliqués. Trop de statistiques et trop \"d'experts\" qui disent tous quelque chose de différent. PredictionXpert simplifie tout ça.",
-        "Ce n'est pas une autre plateforme complexe ou un service de picks. C'est une conversation. Tu poses une question et tu reçois une réponse instantanément.",
-        "Avant le match, pendant, et surtout en direct quand le timing est important, le chat est là.",
-        "Props joueurs, parlays, spreads, paris live — pose tes questions au fur et à mesure que le match avance.",
-        "Simple comme ChatGPT, mais réellement conçu pour les paris sportifs.",
-        "Ton raccourci pour comprendre les paris sans lire 1 000 statistiques.",
-      ],
-      whyBottom: [
-        "Apprends plus vite, parie plus intelligemment.",
-        "Les paris sportifs ne devraient pas être compliqués. On rend ça simple pour toi.",
-        "Pas d'attente. Le chat répond en quelques secondes, 24/7.",
-      ],
-      startChat: "Commencer",
-      signOut: "Déconnexion",
+    hero: {
+      title: 'Ton compagnon pour tes paris sportifs',
+      subtitle: 'Tout sur les paris sportifs. Pose tes questions maintenant.',
+      cta: 'Commencer à chatter',
+      ctaChat: 'Commencer à chatter',
+      ctaSecondary: 'En savoir plus',
     },
-  };
+    liveGameMode: {
+      title: 'Live Game Mode',
+      subtitle: 'Parce que les meilleurs paris se font pendant le match',
+      description: 'Le Live Game Mode te permet de poser des questions en temps réel, pendant que le match se joue. Momentum, changements de cotes, situations clés — le chat t\'aide à y voir clair au bon moment.',
+      cta: 'Essayer le Live Game Mode',
+    },
+    howItWorks: {
+      title: 'Comment ça marche',
+      subtitle: 'Que tu commences, que tu mises régulièrement ou que tu sois déjà expérimenté, on est là pour t\'accompagner dans tes paris sportifs.',
+      steps: [
+        {
+          emoji: '1️⃣',
+          title: 'Crée ton compte',
+          description: 'Inscription en quelques secondes, rien de compliqué.',
+        },
+        {
+          emoji: '2️⃣',
+          title: 'Pose ta question',
+          description: 'Écris n\'importe quoi sur les paris sportifs, le chat répond instantanément.',
+        },
+        {
+          emoji: '3️⃣',
+          title: 'Reçois des réponses claires',
+          description: 'Pas de statistiques confuses ni d\'informations inutiles, juste des explications simples et utiles.',
+        },
+        {
+          emoji: '4️⃣',
+          title: 'Parie plus intelligemment avec le temps',
+          description: 'Plus tu l\'utilises, plus tout devient facile.',
+        },
+      ],
+    },
+    why: {
+      title: 'Pourquoi PredictionXpert',
+      description: 'Les paris sportifs peuvent devenir compliqués. Trop de statistiques et trop "d\'experts" qui disent tous quelque chose de différent. PredictionXpert simplifie tout ça.',
+      points: [
+        'Ce n\'est pas une autre plateforme complexe ou un service de picks. C\'est une conversation. Tu poses une question et tu reçois une réponse instantanément.',
+        'Avant le match, pendant, et surtout en direct quand le timing est important, le chat est là.',
+        'Props joueurs, parlays, spreads, paris live, pose tes questions au fur et à mesure que le match avance.',
+        'Simple comme ChatGPT, mais réellement conçu pour les paris sportifs.',
+        'Ton raccourci pour comprendre les paris sans lire 1 000 statistiques.',
+        'Apprends plus vite, parie plus intelligemment.',
+        'Les paris sportifs ne devraient pas être compliqués. On rend ça simple pour toi.',
+        'Pas d\'attente. Le chat répond en quelques secondes, 24/7.',
+      ],
+      cta: {
+        title: 'Prêt à améliorer tes paris ?',
+        subtitle: 'Rejoins des milliers d\'utilisateurs qui font des paris plus intelligents',
+        button: 'Commencer maintenant',
+      },
+    },
+    pricing: {
+      title: 'Abonnement',
+      subtitle: 'Choisis le plan qui te convient',
+      free: {
+        name: 'Gratuit',
+        price: '0$',
+        period: '/mois',
+        features: [
+          '5 analyses par mois',
+          'Accès aux cotes de base',
+          'Support communautaire',
+        ],
+        cta: 'Commencer gratuitement',
+      },
+      pro: {
+        name: 'Pro',
+        price: '19.99$',
+        period: '/mois',
+        features: [
+          'Analyses illimitées',
+          'Live Game Mode',
+          'Cotes en temps réel',
+          'Analyses approfondies',
+          'Support prioritaire',
+        ],
+        cta: 'Passer Pro',
+        popular: true,
+      },
+    },
+    footer: {
+      links: {
+        disclaimer: 'Avertissement',
+        terms: 'Conditions',
+        privacy: 'Confidentialité',
+      },
+      copyright: '© 2024 PredictionXpert. Tous droits réservés.',
+      disclaimer: 'PredictionXpert ne garantit aucun résultat et peut contenir des erreurs. Les paris sportifs comportent des risques. Service réservé aux 18 ans et plus (ou selon les lois de votre région). Utilisez la plateforme de façon responsable.',
+    },
+  },
+  en: {
+    nav: {
+      login: 'Login',
+      signup: 'Sign up',
+      logout: 'Logout',
+    },
+    hero: {
+      title: 'your sidekick for sports betting',
+      subtitle: 'Everything about sports betting. Just ask now.',
+      cta: 'Start chatting',
+      ctaChat: 'Start chatting',
+      ctaSecondary: 'Learn more',
+    },
+    liveGameMode: {
+      title: 'Live Game Mode',
+      subtitle: 'Because the best bets are made during the match',
+      description: 'Live Game Mode lets you ask questions in real-time, while the game is being played. Momentum, odds changes, key situations — the chat helps you see clearly at the right moment.',
+      cta: 'Try Live Game Mode',
+    },
+    howItWorks: {
+      title: 'How it works',
+      subtitle: 'Whether you\'re just starting, betting regularly, or already sharp, we\'re here to support your sports betting journey.',
+      steps: [
+        {
+          emoji: '1️⃣',
+          title: 'Create your account',
+          description: 'Sign up in seconds',
+        },
+        {
+          emoji: '2️⃣',
+          title: 'Ask anything',
+          description: 'Just type anything about sports betting, the chat answers instantly.',
+        },
+        {
+          emoji: '3️⃣',
+          title: 'Get clear guidance',
+          description: 'No confusing stats, no overload, just simple explanations and smart insights.',
+        },
+        {
+          emoji: '4️⃣',
+          title: 'Bet smarter over time',
+          description: 'The more you use it, the easier betting becomes.',
+        },
+      ],
+    },
+    why: {
+      title: 'Why PredictionXpert',
+      description: 'Sports betting can be overwhelming. Too many stats, too much noise, and way too many "experts" yelling different opinions. PredictionXpert cuts through all of that.',
+      points: [
+        'This isn\'t another dashboard or pick service. It\'s a conversation. You ask, it answers instantly.',
+        'Before the game, during the game, and especially in live betting when timing matters most, we\'re here.',
+        'Props, parlays, spreads, live bets, ask as the game unfolds.',
+        'Simple like ChatGPT, but actually built for sports betting.',
+        'Your shortcut to understanding bets without reading 1,000 stats.',
+        'Learn faster, Bet smarter with us.',
+        'Sports betting shouldn\'t be complicated. We keep it simple for you.',
+        'No waiting, we answers in seconds, 24/7.',
+      ],
+      cta: {
+        title: 'Ready to improve your bets?',
+        subtitle: 'Join thousands of users making smarter bets',
+        button: 'Start now',
+      },
+    },
+    pricing: {
+      title: 'Subscription',
+      subtitle: 'Choose the plan that suits you',
+      free: {
+        name: 'Free',
+        price: '$0',
+        period: '/month',
+        features: [
+          '5 analyses per month',
+          'Access to basic odds',
+          'Community support',
+        ],
+        cta: 'Start for free',
+      },
+      pro: {
+        name: 'Pro',
+        price: '$19.99',
+        period: '/month',
+        features: [
+          'Unlimited analyses',
+          'Live Game Mode',
+          'Real-time odds',
+          'Deep analyses',
+          'Priority support',
+        ],
+        cta: 'Go Pro',
+        popular: true,
+      },
+    },
+        footer: {
+          links: {
+            disclaimer: 'Disclaimer',
+            terms: 'Terms',
+            privacy: 'Privacy',
+          },
+          copyright: '© 2024 PredictionXpert. All rights reserved.',
+          disclaimer: 'PredictionXpert does not guarantee results and may contain errors. Sports betting involves risk. For users 18+ (or according to local laws). Use responsibly.',
+        },
+  },
+}
 
-  const t = content[lang];
+export default function HomePage() {
+  const { lang, setLang } = useLanguage()
+  const { user, signOut } = useAuth()
+  const t = content[lang]
+
+  const handleLogout = async () => {
+    await signOut()
+  }
 
   return (
-    <div className="min-h-screen bg-black font-sans">
+    <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-zinc-800 bg-black/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6 text-black">
-                <path fillRule="evenodd" d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <span className="text-xl font-bold text-white">PredictionXpert</span>
-          </div>
+      <header className="border-b border-zinc-800">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <Link href={`/`} className="flex items-center space-x-2 h-16" aria-label="PredictionXpert Homepage">
+          <Image src="/logo.png" alt="PredictionXpert" width={200} height={80} className="scale-60" priority />
+          </Link>
           <div className="flex items-center gap-4">
+            {/* Disclaimer Links */}
+            <div className="hidden md:flex items-center gap-4">
+              <Link
+                href="/dashboard/disclaimer"
+                className="text-sm text-white hover:text-zinc-300 transition-colors"
+              >
+                {t.footer.links.disclaimer}
+              </Link>
+              <Link
+                href="/dashboard/terms"
+                className="text-sm text-white hover:text-zinc-300 transition-colors"
+              >
+                {t.footer.links.terms}
+              </Link>
+              <Link
+                href="/dashboard/privacy"
+                className="text-sm text-white hover:text-zinc-300 transition-colors"
+              >
+                {t.footer.links.privacy}
+              </Link>
+            </div>
             {/* Language Toggle */}
-            <button
-              onClick={() => setLang(lang === 'en' ? 'fr' : 'en')}
-              className="rounded-lg border border-zinc-700 px-3 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
-            >
-              {lang === 'en' ? 'FR' : 'EN'}
-            </button>
-            <button
-              onClick={signOut}
-              className="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
-            >
-              {t.signOut}
-            </button>
+            <div className="flex items-center bg-zinc-900 rounded-lg p-1 border border-zinc-700">
+              <button
+                onClick={() => setLang('fr')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                  lang === 'fr'
+                    ? 'bg-white text-black shadow-lg'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                Français
+              </button>
+              <button
+                onClick={() => setLang('en')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                  lang === 'en'
+                    ? 'bg-white text-black shadow-lg'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                English
+              </button>
+            </div>
+            {user ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="px-6 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-zinc-200 transition-all hover:shadow-lg hover:shadow-white/20 hover:-translate-y-0.5"
+                >
+                  Chat
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 text-sm font-medium text-white hover:text-zinc-300 transition-colors"
+                >
+                  {t.nav.logout}
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="px-4 py-2 text-sm font-medium text-white hover:text-zinc-300 transition-colors"
+                >
+                  {t.nav.login}
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-6 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-zinc-200 transition-all hover:shadow-lg hover:shadow-white/20 hover:-translate-y-0.5"
+                >
+                  {t.nav.signup}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
-            PredictionXpert
-          </h1>
-          <p className="mt-4 text-xl text-zinc-400 sm:text-2xl">
-            {t.slogan}
-          </p>
-          <p className="mx-auto mt-8 max-w-2xl text-lg text-zinc-500">
-            {t.tagline}
-          </p>
-          <div className="mt-10">
+      <section className="container mx-auto px-4 py-20 text-center h-[80vh] flex flex-col justify-center items-center">
+        <div className="mb-8 flex justify-center">
+        <div className="flex items-center space-x-2 h-16" aria-label="PredictionXpert Homepage">
+          <Image src="/logo.png" alt="PredictionXpert" width={400} height={80} className="scale-100" priority />
+          </div>        </div>
+        <h1 className="text-6xl md:text-7xl font-bold mb-6 text-white">
+          {t.hero.title}
+        </h1>
+            <p className="text-2xl md:text-3xl text-white mb-12 max-w-3xl mx-auto font-medium">
+          {t.hero.subtitle}
+        </p>
+        <div className="flex gap-4 justify-center">
+          <Link
+            href={user ? "/dashboard" : "/signup"}
+            className="px-8 py-4 bg-white text-black rounded-lg text-lg font-semibold hover:bg-zinc-200 transition-all hover:shadow-[0_20px_50px_rgba(255,255,255,0.4)] hover:-translate-y-2 hover:scale-105"
+          >
+            {user ? t.hero.ctaChat : t.hero.cta}
+          </Link>
+          <Link
+            href="#how-it-works"
+            className="px-8 py-4 border-2 border-white text-white rounded-lg text-lg font-semibold hover:bg-white hover:text-black transition-all hover:shadow-[0_20px_50px_rgba(255,255,255,0.3)] hover:-translate-y-2 hover:scale-105"
+          >
+            {t.hero.ctaSecondary}
+          </Link>
+        </div>
+      </section>
+
+      {/* Live Game Mode Section */}
+      <section className="relative bg-gradient-to-r from-purple-900/70 via-blue-900/70 to-purple-900/70 py-24 border-y-2 border-purple-700/50 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 via-blue-600/20 to-purple-600/20 animate-pulse"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(139,92,246,0.3),transparent_50%)]"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-5xl md:text-6xl font-bold mb-4 text-white drop-shadow-[0_4px_20px_rgba(139,92,246,0.5)]">
+              {t.liveGameMode.title}
+            </h2>
+            <p className="text-2xl text-white mb-6 font-medium">{t.liveGameMode.subtitle}</p>
+            <p className="text-xl text-white mb-8 max-w-2xl mx-auto leading-relaxed">
+              {t.liveGameMode.description}
+            </p>
             <Link
-              href="/dashboard"
-              className="inline-flex h-14 items-center justify-center rounded-full bg-white px-8 text-lg font-semibold text-black transition-all hover:bg-zinc-200 hover:scale-105"
+              href="/signup"
+              className="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-lg font-semibold hover:from-purple-500 hover:to-blue-500 transition-all hover:shadow-[0_20px_50px_rgba(139,92,246,0.6)] hover:-translate-y-2 hover:scale-105"
             >
-              {t.startChat}
-              <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
+              {t.liveGameMode.cta}
             </Link>
           </div>
         </div>
       </section>
 
-      {/* How it Works Section */}
-      <section className="border-t border-zinc-800 bg-zinc-950 py-16 sm:py-24">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">
-              {t.howItWorks}
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-20 bg-zinc-900">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
+              {t.howItWorks.title}
             </h2>
-            <p className="mx-auto mt-4 max-w-3xl text-lg text-zinc-400">
-              {t.howItWorksDesc}
+            <p className="text-xl text-white max-w-3xl mx-auto">
+              {t.howItWorks.subtitle}
             </p>
           </div>
-          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {t.steps.map((step, index) => (
-              <div key={index} className="relative rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white text-xl font-bold text-black">
-                  {step.num}
-                </div>
-                <h3 className="mb-2 text-lg font-semibold text-white">
-                  {step.title}
-                </h3>
-                <p className="text-sm text-zinc-400">
-                  {step.desc}
-                </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {t.howItWorks.steps.map((step, index) => (
+              <div
+                key={index}
+                className="bg-black border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 hover:shadow-xl hover:shadow-zinc-900/50 transition-all hover:-translate-y-1"
+              >
+                <div className="text-4xl mb-4">{step.emoji}</div>
+                <h3 className="text-xl font-semibold mb-3 text-white">{step.title}</h3>
+                <p className="text-white">{step.description}</p>
               </div>
             ))}
           </div>
@@ -178,59 +391,144 @@ export default function Home() {
       </section>
 
       {/* Why PredictionXpert Section */}
-      <section className="border-t border-zinc-800 py-16 sm:py-24">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">
-            {t.whyTitle}
-          </h2>
-          <div className="mt-12 space-y-6">
-            {t.whyContent.map((paragraph, index) => (
-              <p key={index} className="text-lg leading-relaxed text-zinc-400">
-                {paragraph}
-              </p>
-            ))}
+      <section id="why" className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+              {t.why.title}
+            </h2>
+            <p className="text-xl text-white max-w-3xl mx-auto mb-12">
+              {t.why.description}
+            </p>
           </div>
-          <div className="mt-12 rounded-2xl border border-zinc-800 bg-zinc-900 p-8">
-            {t.whyBottom.map((line, index) => (
-              <p key={index} className="mb-2 text-lg font-medium text-white last:mb-0">
-                {line}
-              </p>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="border-t border-zinc-800 bg-zinc-950 py-16 sm:py-24">
-        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-          <h2 className="text-3xl font-bold text-white sm:text-4xl">
-            {lang === 'en' ? 'Ready to bet smarter?' : 'Prêt à parier plus intelligemment?'}
-          </h2>
-          <p className="mt-4 text-lg text-zinc-400">
-            {t.tagline}
-          </p>
-          <div className="mt-8">
+          {/* Grille avec bulles shadow boxing */}
+          <div className="max-w-5xl mx-auto mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {t.why.points.map((point, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="bg-gradient-to-br from-zinc-900 to-zinc-800 border-2 border-zinc-700 rounded-2xl p-6 md:p-8 hover:shadow-[0_12px_30px_rgba(139,92,246,0.6),0_6px_12px_rgba(59,130,246,0.5)] hover:border-purple-600 hover:-translate-y-2 transition-all duration-300"
+                  >
+                    <p className="text-lg md:text-xl text-white leading-relaxed">{point}</p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* CTA Box */}
+          <div className="max-w-3xl mx-auto bg-gradient-to-r from-zinc-900 to-zinc-800 border-2 border-zinc-700 rounded-2xl p-8 text-center">
+            <h3 className="text-3xl font-bold mb-4 text-white">{t.why.cta.title}</h3>
+            <p className="text-xl text-zinc-300 mb-8">{t.why.cta.subtitle}</p>
             <Link
-              href="/dashboard"
-              className="inline-flex h-14 items-center justify-center rounded-full bg-white px-8 text-lg font-semibold text-black transition-all hover:bg-zinc-200 hover:scale-105"
+              href="/signup"
+              className="inline-block px-8 py-4 bg-white text-black rounded-lg text-lg font-semibold hover:bg-zinc-200 transition-all hover:shadow-[0_20px_50px_rgba(255,255,255,0.4)] hover:-translate-y-2 hover:scale-105"
             >
-              {t.startChat}
-              <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
+              {t.why.cta.button}
             </Link>
           </div>
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section className="py-20 bg-zinc-900">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
+              {t.pricing.title}
+            </h2>
+            <p className="text-xl text-white">{t.pricing.subtitle}</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Free Plan */}
+            <div className="bg-black border-2 border-zinc-800 rounded-xl p-8">
+              <h3 className="text-2xl font-bold mb-2 text-white">{t.pricing.free.name}</h3>
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-white">{t.pricing.free.price}</span>
+                <span className="text-white">{t.pricing.free.period}</span>
+              </div>
+              <ul className="space-y-3 mb-8">
+                {t.pricing.free.features.map((feature, index) => (
+                  <li key={index} className="flex items-start gap-2 text-white">
+                    <span className="text-green-500 mt-1">✓</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/signup"
+                className="block w-full text-center px-6 py-3 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-black transition-all hover:shadow-[0_15px_40px_rgba(255,255,255,0.3)] hover:-translate-y-1"
+              >
+                {t.pricing.free.cta}
+              </Link>
+            </div>
+
+            {/* Pro Plan */}
+            <div className="bg-gradient-to-br from-zinc-900 to-black border-2 border-white rounded-xl p-8 relative">
+              {t.pricing.pro.popular && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white text-black px-4 py-1 rounded-full text-sm font-semibold">
+                  Populaire
+                </div>
+              )}
+              <h3 className="text-2xl font-bold mb-2 text-white">{t.pricing.pro.name}</h3>
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-white">{t.pricing.pro.price}</span>
+                <span className="text-white">{t.pricing.pro.period}</span>
+              </div>
+              <ul className="space-y-3 mb-8">
+                {t.pricing.pro.features.map((feature, index) => (
+                  <li key={index} className="flex items-start gap-2 text-white">
+                    <span className="text-green-500 mt-1">✓</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/signup"
+                className="block w-full text-center px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 transition-all hover:shadow-[0_15px_40px_rgba(255,255,255,0.4)] hover:-translate-y-1 hover:scale-105"
+              >
+                {t.pricing.pro.cta}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="border-t border-zinc-800 bg-black py-8">
-        <div className="mx-auto max-w-6xl px-4 text-center sm:px-6">
-          <p className="text-sm text-zinc-500">
-            &copy; {new Date().getFullYear()} PredictionXpert. {lang === 'en' ? 'All rights reserved.' : 'Tous droits réservés.'}
-          </p>
+      <footer className="border-t border-zinc-800 py-12">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-6">
+                <Link
+                  href="/dashboard/disclaimer"
+                  className="text-zinc-400 hover:text-white transition-colors"
+                >
+                  {t.footer.links.disclaimer}
+                </Link>
+                <Link
+                  href="/dashboard/terms"
+                  className="text-zinc-400 hover:text-white transition-colors"
+                >
+                  {t.footer.links.terms}
+                </Link>
+                <Link
+                  href="/dashboard/privacy"
+                  className="text-zinc-400 hover:text-white transition-colors"
+                >
+                  {t.footer.links.privacy}
+                </Link>
+              </div>
+              <p className="text-zinc-400 text-xs max-w-3xl">{t.footer.disclaimer}</p>
+              <p className="text-zinc-400 text-sm">{t.footer.copyright}</p>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
-  );
+  )
 }
+
