@@ -15,50 +15,50 @@ function useIsPro() {
   return false // For now, assume user is not Pro
 }
 
-// Quick actions - titles only, with intro messages that the agent will write
+// Quick actions - simple user messages that trigger AI guidance
 const SUGGESTIONS_FR = [
   {
     title: 'Créer un parlay',
-    introMessage: "Tu veux construire un parlay ? Dis-moi quel sport ou quelle ligue (NHL, NBA, NFL, etc.). Dis-moi aussi les matchs que tu as déjà en tête. Ou dis-moi quel niveau de risque tu veux (sécuritaire, moyen ou long shot).",
+    userMessage: "Je veux créer un parlay",
   },
   {
     title: 'Analyser mon pari',
-    introMessage: "Écris moi ton billet de pari et je vais analyser sa valeur, son risque, si ça fait du sens et si je fais des ajustements.",
+    userMessage: "Je veux faire analyser mon pari",
   },
   {
     title: 'Match en direct',
-    introMessage: "Quel match en direct veux-tu que j'analyse en ce moment ? Je vais t'aider selon le momentum, les mouvements de côtes et les fenêtres de paris live.",
+    userMessage: "J'ai besoin d'aide pour un match en direct",
   },
   {
     title: 'Paris joueurs',
-    introMessage: "Tu veux des idées de props joueurs ? Dis-moi le sport, le type de pari ou les joueurs que tu as en tête.",
+    userMessage: "Je cherche des idées de paris joueurs",
   },
   {
     title: 'Apprendre quelque chose',
-    introMessage: "Tu veux apprendre un terme, une stratégie, un concept ou comprendre comment fonctionnent certains paris ? Pose ta question.",
+    userMessage: "Je veux apprendre sur les paris sportifs",
   },
 ]
 
 const SUGGESTIONS_EN = [
   {
     title: 'Create a Parlay',
-    introMessage: "Want to build a parlay? Tell me which sport or league (NHL, NBA, NFL, etc.). Tell me which games you already have in mind. Or tell me what type of risk you want (safe, medium, long shot).",
+    userMessage: "I want to create a parlay",
   },
   {
     title: 'Analyze My Bet',
-    introMessage: "Paste your bet slip and I'll analyze its value, risk, what makes sense, and whether I'd adjust anything.",
+    userMessage: "I want to analyze my bet",
   },
   {
     title: 'Live Game Help',
-    introMessage: "What live game do you want help with right now? I'll guide you based on momentum, odds movement, and live betting windows.",
+    userMessage: "I need help with a live game",
   },
   {
     title: 'Player Props',
-    introMessage: "Want prop ideas? Tell me the sport, the type of bet, or a player you have in mind.",
+    userMessage: "I'm looking for player prop ideas",
   },
   {
     title: 'Learn Something',
-    introMessage: "Want to learn betting concepts, terms, strategies, or how odds work? Ask anything.",
+    userMessage: "I want to learn about sports betting",
   },
 ]
 
@@ -92,9 +92,8 @@ export function ChatWindow() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const handleSuggestionClick = (introMessage: string) => {
-    // Send the intro message that the agent will write
-    sendMessage(introMessage)
+  const handleSuggestionClick = (userMessage: string) => {
+    sendMessage(userMessage)
   }
 
   return (
@@ -152,7 +151,7 @@ export function ChatWindow() {
               {SUGGESTIONS.map((s, i) => (
                 <button
                   key={i}
-                  onClick={() => handleSuggestionClick(s.introMessage)}
+                  onClick={() => handleSuggestionClick(s.userMessage)}
                   disabled={isStreaming}
                   className="rounded-xl border-2 border-zinc-300 bg-white p-3 md:p-4 text-left transition-all hover:border-zinc-400 hover:bg-zinc-50 hover:shadow-lg hover:shadow-zinc-300/50 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-50"
                 >
