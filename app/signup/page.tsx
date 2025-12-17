@@ -9,9 +9,27 @@ export default function SignupPage() {
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [postalCode, setPostalCode] = useState('')
+  const [postalCodeError, setPostalCodeError] = useState<string | null>(null)
+  const [validatingPostalCode, setValidatingPostalCode] = useState(false)
   const [legalAccepted, setLegalAccepted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const validatePostalCode = async (code: string): Promise<boolean> => {
+    const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+    if (!mapboxToken) {
+      console.error('Mapbox token not found')
+      return true // Allow submission if token is missing
+    }
+
+    const response = await fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(code)}.json?country=ca&types=postcode&access_token=${mapboxToken}`
+    )
+    const data = await response.json()
+
+    return data.features && data.features.length > 0
+  }
   const router = useRouter()
   const supabase = createClient()
 
@@ -19,8 +37,20 @@ export default function SignupPage() {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    setPostalCodeError(null)
 
     try {
+      // Validate postal code with Mapbox
+      setValidatingPostalCode(true)
+      const isValidPostalCode = await validatePostalCode(postalCode)
+      setValidatingPostalCode(false)
+
+      if (!isValidPostalCode) {
+        setPostalCodeError('Code postal invalide. Veuillez entrer un code postal canadien valide.')
+        setLoading(false)
+        return
+      }
+
       // Sign up the user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
@@ -36,6 +66,7 @@ export default function SignupPage() {
           .update({
             username,
             email,
+            postal_code: postalCode,
             legal_accepted_at: new Date().toISOString(),
           })
           .eq('id', authData.user.id)
@@ -127,6 +158,36 @@ export default function SignupPage() {
             </p>
           </div>
 
+          <div>
+            <label
+              htmlFor="postalCode"
+              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+            >
+              Code postal
+            </label>
+            <input
+              id="postalCode"
+              type="text"
+              value={postalCode}
+              onChange={(e) => {
+                setPostalCode(e.target.value.toUpperCase())
+                setPostalCodeError(null)
+              }}
+              required
+              className={`mt-1 block w-full rounded-md border bg-white px-3 py-2 text-black shadow-sm focus:outline-none dark:bg-zinc-800 dark:text-zinc-50 ${
+                postalCodeError
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                  : 'border-zinc-300 focus:border-zinc-500 focus:ring-zinc-500 dark:border-zinc-600'
+              }`}
+              placeholder="A1A 1A1"
+            />
+            {postalCodeError && (
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                {postalCodeError}
+              </p>
+            )}
+          </div>
+
           <div className="flex items-start gap-3">
             <input
               id="legalAccepted"
@@ -150,7 +211,7 @@ export default function SignupPage() {
             disabled={loading || !legalAccepted}
             className="w-full rounded-md bg-black px-4 py-2 font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
           >
-            {loading ? 'Création...' : 'Créer un compte'}
+            {loading ? (validatingPostalCode ? 'Vérification du code postal...' : 'Création...') : 'Créer un compte'}
           </button>
         </form>
 

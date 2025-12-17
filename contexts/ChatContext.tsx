@@ -84,6 +84,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({
           message: content.trim(),
           conversationHistory,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }),
       })
 
