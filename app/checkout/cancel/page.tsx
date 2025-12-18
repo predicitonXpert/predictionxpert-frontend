@@ -9,14 +9,14 @@ const content = {
     title: 'Paiement annule',
     subtitle: 'Pas de soucis, tu peux reessayer quand tu veux',
     description: 'Ton abonnement n\'a pas ete active. Si tu as des questions, n\'hesite pas a nous contacter.',
-    cta: 'Retour aux tarifs',
+    cta: 'Retour au chat',
     secondary: 'Retour a l\'accueil',
   },
   en: {
     title: 'Payment cancelled',
     subtitle: 'No worries, you can try again anytime',
     description: 'Your subscription was not activated. If you have any questions, feel free to contact us.',
-    cta: 'Back to pricing',
+    cta: 'Back to chat',
     secondary: 'Back to home',
   },
 }
@@ -51,7 +51,7 @@ export default function CheckoutCancelPage() {
         {/* CTAs */}
         <div className="space-y-4">
           <Link
-            href="/pricing"
+            href="/dashboard"
             className="block w-full py-3 px-6 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold transition-colors"
           >
             {t.cta}

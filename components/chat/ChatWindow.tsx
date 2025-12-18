@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ChatMessage } from './ChatMessage'
 import { ChatInput } from './ChatInput'
 import { useChat } from '@/contexts/ChatContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
-import Link from 'next/link'
+import { redirectToCheckout } from '@/lib/stripe'
 
 // Quick actions - simple user messages that trigger AI guidance
 const SUGGESTIONS_FR = [
@@ -57,15 +57,16 @@ const SUGGESTIONS_EN = [
 
 export function ChatWindow() {
   const { messages, isStreaming, error, sendMessage, clearMessages, clearError } = useChat()
-  const { isPro } = useAuth()
+  const { user, isPro } = useAuth()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { lang } = useLanguage()
-  
+  const [upgradeLoading, setUpgradeLoading] = useState(false)
+
   const SUGGESTIONS = lang === 'fr' ? SUGGESTIONS_FR : SUGGESTIONS_EN
-  const chatPlaceholder = lang === 'fr' 
+  const chatPlaceholder = lang === 'fr'
     ? 'Tout sur les paris sportifs. Pose tes questions maintenant.'
     : 'Everything about sports betting. Just ask now.'
-  
+
   const texts = {
     fr: {
       free: 'Gratuit',
@@ -78,12 +79,23 @@ export function ChatWindow() {
       clear: 'Clear',
     },
   }
-  
+
   const t = texts[lang]
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  const handleUpgrade = async () => {
+    if (!user) return
+    setUpgradeLoading(true)
+    try {
+      await redirectToCheckout(user.id, user.email || '')
+    } catch (err) {
+      console.error('Failed to start checkout:', err)
+      setUpgradeLoading(false)
+    }
+  }
 
   const handleSuggestionClick = (userMessage: string) => {
     sendMessage(userMessage)
@@ -97,12 +109,13 @@ export function ChatWindow() {
           {!isPro && (
             <div className="flex items-center gap-1.5 md:gap-2 rounded-lg bg-yellow-100 border border-yellow-300 px-2 md:px-3 py-1 md:py-1.5">
               <span className="text-xs font-medium text-yellow-800">{t.free}</span>
-              <Link
-                href="/dashboard/pricing"
-                className="text-xs font-semibold text-yellow-700 hover:text-yellow-900 underline"
+              <button
+                onClick={handleUpgrade}
+                disabled={upgradeLoading}
+                className="text-xs font-semibold text-yellow-700 hover:text-yellow-900 underline disabled:opacity-50"
               >
-                {t.upgradeToPro}
-              </Link>
+                {upgradeLoading ? '...' : t.upgradeToPro}
+              </button>
             </div>
           )}
         </div>
