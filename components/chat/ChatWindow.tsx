@@ -8,13 +8,6 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Link from 'next/link'
 
-// Mock function to check if user is Pro - replace with actual logic
-function useIsPro() {
-  const { user } = useAuth()
-  // TODO: Replace with actual subscription check
-  return false // For now, assume user is not Pro
-}
-
 // Quick actions - simple user messages that trigger AI guidance
 const SUGGESTIONS_FR = [
   {
@@ -64,7 +57,7 @@ const SUGGESTIONS_EN = [
 
 export function ChatWindow() {
   const { messages, isStreaming, error, sendMessage, clearMessages, clearError } = useChat()
-  const isPro = useIsPro()
+  const { isPro } = useAuth()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { lang } = useLanguage()
   
@@ -105,7 +98,7 @@ export function ChatWindow() {
             <div className="flex items-center gap-1.5 md:gap-2 rounded-lg bg-yellow-100 border border-yellow-300 px-2 md:px-3 py-1 md:py-1.5">
               <span className="text-xs font-medium text-yellow-800">{t.free}</span>
               <Link
-                href="/#pricing"
+                href="/dashboard/pricing"
                 className="text-xs font-semibold text-yellow-700 hover:text-yellow-900 underline"
               >
                 {t.upgradeToPro}
